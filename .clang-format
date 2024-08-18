@@ -1,0 +1,14 @@
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: false
+AlignOperands: AlignAfterOperator
+AllowShortBlocksOnASingleLine: Always
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: WithoutElse
+BreakBeforeBinaryOperators: true
+BreakBeforeBraces: Linux
+ColumnLimit: 120
+DerivePointerAlignment: false
+IndentWidth: 4
+PointerAlignment: Left
+TabWidth: 4
+UseTab: Always
