@@ -10,9 +10,9 @@ int main(int argc, char** argv)
 	std::string exec_stage2 = "bin/" + executable_str + "_stage2";
 
 	auto files = Kitchen::Ingredients().add_ingredients("nob_stage2.cpp");
-	auto recipe = Kitchen::CppRecipe("nob_stage2")
+	auto recipe = Kitchen::CompilerRecipe("nob_stage2")
 					  .compiler(CC)
-					  .cpp_version("c++23")
+					  .std_version("c++23")
 					  .optimization(Kitchen::Heat::Oz)
 					  .files(files)
 					  .output(exec_stage2)

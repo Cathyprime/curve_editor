@@ -6,10 +6,11 @@
 #include <unordered_map>
 #include <vector>
 
-namespace fs = std::filesystem;
-namespace ranges = std::ranges;
-namespace views = std::ranges::views;
 using namespace Kitchen;
+
+namespace fs = std::filesystem;
+namespace views = std::ranges::views;
+namespace ranges = std::ranges;
 
 void help()
 {
@@ -24,24 +25,14 @@ void help()
 int main(int argc, char** argv)
 {
 	Chef chef{};
+	const char* raylib = "external/raylib-5.0_linux_amd64/";
 
 	Sink::stage(2);
 
-	{
-		const char* output = "external/raylib-5.0_linux_amd64/";
-		CommandRecipe download_raylib{};
-		CommandRecipe unpack_raylib{};
-
-		auto comp = [](const std::string& output) -> bool { return !fs::exists(output); };
-
-		download_raylib.output(output).cache().cache_func(comp).push(
-			{"wget", "-P", "./external", "https://github.com/raysan5/raylib/releases/download/5.0/raylib-5.0_linux_amd64.tar.gz"});
-
-		unpack_raylib.output(output).cache().cache_func(comp).push(
-			{"tar", "xzf", "./external/raylib-5.0_linux_amd64.tar.gz", "-C", "./external"});
-
-		chef.cook(&download_raylib);
-		chef.cook(&unpack_raylib);
+	if (!fs::exists(raylib)) {
+		Sink::start_job_sync({"wget", "-P", "./external",
+							  "https://github.com/raysan5/raylib/releases/download/5.0/raylib-5.0_linux_amd64.tar.gz"});
+		Sink::start_job_sync({"tar", "xzf", "./external/raylib-5.0_linux_amd64.tar.gz", "-C", "./external"});
 	}
 
 	auto non_main_file_names = ranges::subrange(fs::directory_iterator("."), fs::directory_iterator())
@@ -65,7 +56,7 @@ int main(int argc, char** argv)
 	LineCook line_cook{};
 	Ingredients o_files{};
 	Ingredients created_files{};
-	CppRecipe main("main recipe");
+	CompilerRecipe main("main recipe");
 
 	(void)Sink::shift_args(&argc, &argv); // discard executable name
 
@@ -79,12 +70,12 @@ int main(int argc, char** argv)
 			created_files.add_ingredients(o_file);
 			files->add_ingredients(filename + ".cpp");
 
-			auto recipe = new CppRecipe("");
+			auto recipe = new CompilerRecipe("");
 			recipe->compiler(CC)
 				.push(flags.get_ingredients())
 				.cache()
 				.output(o_file)
-				.cpp_version("c++23")
+				.std_version("c++23")
 				.files(*files);
 
 			line_cook += recipe;
@@ -98,7 +89,7 @@ int main(int argc, char** argv)
 	o_files += "main.cpp";
 	main.compiler(CC)
 		.cache()
-		.cpp_version("c++23")
+		.std_version("c++23")
 		.push({"-I./external/raylib-5.0_linux_amd64/include/"})
 		.files(o_files)
 		.push({"-L./external/raylib-5.0_linux_amd64/lib/"})
