@@ -1,24 +1,22 @@
-#include "width.hh"
-#include "height.hh"
-#include "text.hh"
-#include "title.hh"
 #include <raylib.h>
 
-const int WIDTH = width();
-const int HEIGHT = height();
+const int WIDTH = 1920;
+const int HEIGHT = 1080;
+const char* TITLE = "Hello, Raylib!";
+const char* TEXT = "Hello from raylib";
 
 int main()
 {
-	InitWindow(WIDTH, HEIGHT, title());
+	InitWindow(WIDTH, HEIGHT, TITLE);
 	SetTargetFPS(120);
-	int text_width = MeasureText(text(), 200);
+	int text_width = MeasureText(TEXT, 200);
 
-	while(!WindowShouldClose()) {
+	while (!WindowShouldClose()) {
 		BeginDrawing();
 
 		ClearBackground(WHITE);
 
-		DrawText(text(), WIDTH/2 - text_width/2, HEIGHT/2 - 100, 200, RED);
+		DrawText(TEXT, WIDTH / 2 - text_width / 2, HEIGHT / 2 - 100, 200, RED);
 		DrawFPS(0, 0);
 		EndDrawing();
 	}

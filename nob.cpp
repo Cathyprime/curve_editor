@@ -3,9 +3,9 @@
 int main(int argc, char** argv)
 {
 	GO_REBUILD_YOURSELF(argc, argv);
-	KitchenSink::stage(1);
+	Kitchen::Sink::stage(1);
 
-	std::filesystem::path executable_path = KitchenSink::shift_args(&argc, &argv);
+	std::filesystem::path executable_path = Kitchen::Sink::shift_args(&argc, &argv);
 	std::string executable_str = executable_path.filename().string();
 	std::string exec_stage2 = "bin/" + executable_str + "_stage2";
 
@@ -20,14 +20,13 @@ int main(int argc, char** argv)
 
 	Kitchen::Chef chef{};
 
-	chef += &recipe;
-	int status = chef.cook();
+	int status = chef.cook(&recipe);
 
 	if (status == 0) {
 		std::vector<std::string> command(argv, argv + argc);
 		command.insert(command.begin(), exec_stage2);
-		KitchenSink::start_job_sync(command);
+		Kitchen::Sink::start_job_sync(command);
 	} else {
-		KitchenSink::log(KitchenSink::LogLevel::ERROR, "failed to compile stage 2");
+		Kitchen::Sink::log(Kitchen::Sink::LogLevel::ERROR, "failed to compile stage 2");
 	}
 }
