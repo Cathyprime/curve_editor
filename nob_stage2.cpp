@@ -13,11 +13,12 @@ using namespace Kitchen;
 
 void help()
 {
+	std::cout << std::endl;
 	std::cout << "[HELP]: provide one of the arguments:" << std::endl;
-	std::cout << "[HELP]: -> run - compile and run the app" << std::endl;
-	std::cout << "[HELP]: -> help - display help" << std::endl;
-	std::cout << "[HELP]: -> build - compile the app" << std::endl;
-	std::cout << "[HELP]: -> clean - remove build artefacts" << std::endl;
+	std::cout << "[HELP]:	-> run - compile and run the app" << std::endl;
+	std::cout << "[HELP]:	-> help - display help" << std::endl;
+	std::cout << "[HELP]:	-> build - compile the app" << std::endl;
+	std::cout << "[HELP]:	-> clean - remove build artefacts" << std::endl;
 }
 
 int main(int argc, char** argv)
@@ -96,6 +97,7 @@ int main(int argc, char** argv)
 
 	o_files += "main.cpp";
 	main.compiler(CC)
+		.cache()
 		.cpp_version("c++23")
 		.push({"-I./external/raylib-5.0_linux_amd64/include/"})
 		.files(o_files)
