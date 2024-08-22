@@ -24,7 +24,6 @@ void help()
 
 int main(int argc, char** argv)
 {
-	Chef chef{};
 	const char* raylib = "external/raylib-5.0_linux_amd64/";
 
 	Sink::stage(2);
@@ -100,11 +99,11 @@ int main(int argc, char** argv)
 
 	std::unordered_map<std::string, std::function<void()>> arg_handler{};
 	arg_handler.insert_or_assign("run", [&]() {
-		chef.cook(&main);
+		Kitchen::cook(&main);
 		std::cout << std::endl;
 		Sink::start_job_sync({"./bin/main"});
 	});
-	arg_handler.insert_or_assign("build", [&]() { chef.cook(&main); });
+	arg_handler.insert_or_assign("build", [&]() { Kitchen::cook(&main); });
 	arg_handler.insert_or_assign("clean", [&]() {
 		for (const auto& file : created_files.get_ingredients()) {
 			Sink::print_command({"rm", "-rf", file});

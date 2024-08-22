@@ -18,9 +18,7 @@ int main(int argc, char** argv)
 					  .output(exec_stage2)
 					  .cache();
 
-	Kitchen::Chef chef{};
-
-	int status = chef.cook(&recipe);
+	int status = Kitchen::cook(&recipe);
 
 	if (status == 0) {
 		std::vector<std::string> command(argv, argv + argc);

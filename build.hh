@@ -178,29 +178,8 @@
 #endif // GUY_FIERI
 #endif // _WIN32
 
-#define INGREDIENTS_SETTER(method_name, member_variable)                                                               \
-	inline CppRecipe& CppRecipe::method_name(Ingredients& value)                                                       \
-	{                                                                                                                  \
-		method_name(std::move(value));                                                                                 \
-		return *this;                                                                                                  \
-	}                                                                                                                  \
-	inline CppRecipe& CppRecipe::method_name(Ingredients&& value)                                                      \
-	{                                                                                                                  \
-		member_variable = value.get_ingredients();                                                                     \
-		return *this;                                                                                                  \
-	}
-
-#define SETTER(class, method_name, type, member_variable)                                                              \
-	inline class& class ::method_name(type value)                                                                      \
-	{                                                                                                                  \
-		member_variable = value;                                                                                       \
-		return *this;                                                                                                  \
-	}
-
-namespace Kitchen
-{
-namespace Sink
-{
+namespace Kitchen {
+namespace Sink {
 
 enum class LogLevel { INFO, WARN, ERROR };
 
@@ -233,7 +212,10 @@ inline int start_job_sync(const std::vector<std::string>& command)
 	return result;
 }
 
-inline char* shift_args(int* argc, char*** argv) { return (*argc)--, *(*argv)++; }
+inline char* shift_args(int* argc, char*** argv)
+{
+	return (*argc)--, *(*argv)++;
+}
 
 inline void mkdir(const std::string& directory)
 {
@@ -279,7 +261,6 @@ class Recipe
 	virtual bool rebuild_needed() const = 0;
 };
 
-class Chef;
 class Ingredients;
 
 class Ingredients
@@ -329,19 +310,7 @@ class CompilerRecipe : public Recipe
 	std::vector<std::string> get_command() const override;
 };
 
-class Chef
-{
-	friend class LineCook;
-
-  public:
-	static int cook(Recipe* recipe);
-	int cook();
-	int cook(const std::string& name);
-	void dessert();
-	void dessert(const std::string& name);
-};
-
-class LineCook : public Chef
+class LineCook
 {
   private:
 	std::vector<Recipe*> m_Recipes;
@@ -351,21 +320,39 @@ class LineCook : public Chef
 	LineCook& learn_recipe(Recipe* recipe);
 	int cook();
 	void dessert();
-	void dessert(const std::string& name);
 	void operator+=(Recipe* recipe);
 };
 
 enum class Heat { O0, O1, O2, O3, Ofast, Os, Oz, Og };
 
-inline void Ingredients::operator+=(const std::string& file) { (void)add_ingredients(file); }
+inline void Ingredients::operator+=(const std::string& file)
+{
+	(void)add_ingredients(file);
+}
 
-SETTER(Ingredients, prefix, const std::string&, m_Prefix);
+inline int cook(Recipe* recipe)
+{
+	int status = 0;
+
+	if (recipe->rebuild_needed()) {
+		auto command = recipe->get_command();
+		Kitchen::Sink::print_command(command);
+		status = Kitchen::Sink::start_job_sync(std::move(command));
+	}
+	return status;
+}
+
+inline Ingredients& Ingredients::prefix(const std::string& value)
+{
+	m_Prefix = value;
+	return *this;
+}
 
 inline Ingredients& Ingredients::add_ingredients(const std ::string& value)
 {
 	m_Files.push_back(value);
 	return *this;
-};
+}
 
 inline std::vector<std::string> Ingredients::get_ingredients() const
 {
@@ -485,37 +472,21 @@ inline bool CompilerRecipe::rebuild_needed() const
 	return should_rebuild;
 }
 
-inline int Chef::cook(Recipe* recipe)
-{
-	int status = 0;
-
-	if (recipe->rebuild_needed()) {
-		auto command = recipe->get_command();
-		Kitchen::Sink::print_command(command);
-		status = Kitchen::Sink::start_job_sync(std::move(command));
-	}
-	return status;
-}
-
-inline void Chef::dessert() { std::exit(cook()); }
-
-inline void Chef::dessert(const std::string& recipe_name) { std::exit(cook(recipe_name)); }
-
 inline LineCook& LineCook::learn_recipe(Recipe* recipe)
 {
 	m_Recipes.push_back(recipe);
 	return *this;
 }
 
-inline void LineCook::operator+=(Recipe* recipe) { learn_recipe(std::move(recipe)); }
-
-inline void LineCook::dessert(const std::string& name)
+inline void LineCook::operator+=(Recipe* recipe)
 {
-	(void)name;
-	std::exit(cook());
+	learn_recipe(std::move(recipe));
 }
 
-inline void LineCook::dessert() { std::exit(cook()); }
+inline void LineCook::dessert()
+{
+	std::exit(cook());
+}
 
 inline int LineCook::cook()
 {
