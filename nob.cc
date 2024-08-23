@@ -14,6 +14,7 @@ int main(int argc, char** argv)
 					  .compiler(CC)
 					  .std_version("c++23")
 					  .optimization(Kitchen::Heat::Oz)
+					  .push({"-g"})
 					  .files(files)
 					  .output(exec_stage2)
 					  .cache();
@@ -23,7 +24,7 @@ int main(int argc, char** argv)
 	if (status == 0) {
 		std::vector<std::string> command(argv, argv + argc);
 		command.insert(command.begin(), exec_stage2);
-		Kitchen::Sink::start_job_sync(command);
+		std::exit(Kitchen::Sink::start_job_sync(command));
 	} else {
 		Kitchen::Sink::log(Kitchen::Sink::LogLevel::ERROR, "failed to compile stage 2");
 	}

@@ -1,15 +1,27 @@
 #include "drawing.hh"
 #include "consts.hh"
 #include "math.hh"
-#include <cstddef>
 #include <raylib.h>
+#include <string>
+
+Vector2* RaylibDrawing::dragged_point = nullptr;
+std::vector<Vector2> RaylibDrawing::points;
+Vector2 RaylibDrawing::mouse;
+bool RaylibDrawing::initialized = false;
+
+#define CIRCLE_RADIUS 10
 
 RaylibDrawing::RaylibDrawing()
 {
 	BeginDrawing();
-	top = Vector2(960, 200);
-	bottom_left = Vector2(400, 880);
-	bottom_right = Vector2(1520, 880);
+	if (!initialized) {
+		points.reserve(4);
+		points.push_back(Vector2(760, 740));
+		points.push_back(Vector2(760, 340));
+		points.push_back(Vector2(1160, 340));
+		points.push_back(Vector2(1160, 740));
+		initialized = true;
+	}
 }
 
 RaylibDrawing::~RaylibDrawing()
@@ -19,20 +31,29 @@ RaylibDrawing::~RaylibDrawing()
 
 void RaylibDrawing::operator()()
 {
-	ClearBackground(WHITE);
-	DrawCircleV(top, 10, GRAY);
-	DrawCircleV(bottom_left, 10, GRAY);
-	DrawCircleV(bottom_right, 10, GRAY);
+	update();
+	draw();
+}
 
-	DrawLineV(bottom_left, top, GRAY);
-	DrawLineV(top, bottom_right, GRAY);
+void RaylibDrawing::update()
+{
+}
 
-	for (size_t i = 0; i <= 1000; ++i) {
-		auto p1 = bezier::lerp(bottom_left, top, i/1000.0f);
-		auto p2 = bezier::lerp(top, bottom_right, i/1000.0f);
+void RaylibDrawing::draw()
+{
+	ClearBackground(BLACK);
 
-		auto painter = bezier::lerp(p1, p2, i/1000.0f);
-
-		DrawCircleV(painter, 3, RED);
+	for (const auto& point : points) {
+		bool hover = CheckCollisionPointCircle(mouse, point, 10);
+		DrawCircleV(point, 10, hover ? YELLOW : RED);
 	}
+
+	DrawText(std::to_string(mouse.x).c_str(), 0, 0, 50, WHITE);
+	DrawText(std::to_string(mouse.y).c_str(), 0, 50, 50, WHITE);
+
+	for (size_t i = 0; i <= 1000; ++i)
+		DrawCircleV(bezier::Laura_Cubic_Polynomial(points[0], points[1], points[2], points[3], i / 1000.f), 3, YELLOW);
+
+	DrawLineV(points[0], points[1], YELLOW);
+	DrawLineV(points[2], points[3], YELLOW);
 }

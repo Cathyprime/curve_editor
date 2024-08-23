@@ -25,7 +25,6 @@ void help()
 int main(int argc, char** argv)
 {
 	const char* raylib = "external/raylib-5.0_linux_amd64/";
-
 	Sink::stage(2);
 
 	if (!fs::exists(raylib)) {
@@ -60,6 +59,8 @@ int main(int argc, char** argv)
 
 	Ingredients flags{};
 	flags += "-c";
+	flags += "-Wall";
+	flags += "-pedantic";
 
 	if (non_main_file_names.size() > 0) {
 		for (const auto& filename : non_main_file_names) {
@@ -81,7 +82,10 @@ int main(int argc, char** argv)
 		}
 
 		int status = line_cook.cook();
-		if (status != 0) std::exit(status);
+		if (status != 0) {
+			Sink::log(Sink::LogLevel::ERROR, "failed to build .o files");
+			std::exit(status);
+		}
 	}
 
 	o_files += "src/main.cc";
@@ -92,17 +96,19 @@ int main(int argc, char** argv)
 		.files(o_files)
 		.push({"-L./external/raylib-5.0_linux_amd64/lib/"})
 		.push({"-l:libraylib.a", "-lm", "-pthread"})
+		.push({"-Wall", "-pedantic", "-Werror"})
 		.output("bin/main");
 
 	created_files.add_ingredients("bin/main");
 
 	std::unordered_map<std::string, std::function<void()>> arg_handler{};
 	arg_handler.insert_or_assign("run", [&]() {
-		Kitchen::cook(&main);
+		if (Kitchen::cook(&main) != 0)
+			std::exit(1);
 		std::cout << std::endl;
 		Sink::start_job_sync({"./bin/main"});
 	});
-	arg_handler.insert_or_assign("build", [&]() { Kitchen::cook(&main); });
+	arg_handler.insert_or_assign("build", [&]() { std::exit(Kitchen::cook(&main)); });
 	arg_handler.insert_or_assign("clean", [&]() {
 		for (const auto& file : created_files.get_ingredients()) {
 			Sink::print_command({"rm", "-rf", file});

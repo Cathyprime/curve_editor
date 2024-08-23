@@ -1,15 +1,19 @@
 #include <raylib.h>
+#include <vector>
 
 class RaylibDrawing
 {
   private:
-	Vector2 top;
-	Vector2 bottom_left;
-	Vector2 bottom_right;
+	static std::vector<Vector2> points;
+	static Vector2* dragged_point;
+	static Vector2 mouse;
+	static bool initialized;
 
   public:
 	RaylibDrawing();
 	~RaylibDrawing();
 
 	void operator()();
+	void draw();
+	void update();
 };
