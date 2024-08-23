@@ -2,16 +2,14 @@
 
 class RaylibDrawing
 {
+  private:
+	Vector2 top;
+	Vector2 bottom_left;
+	Vector2 bottom_right;
 
   public:
-	RaylibDrawing()
-	{
-		BeginDrawing();
-	}
-	~RaylibDrawing()
-	{
-		EndDrawing();
-	}
+	RaylibDrawing();
+	~RaylibDrawing();
 
 	void operator()();
 };

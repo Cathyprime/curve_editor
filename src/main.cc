@@ -1,6 +1,7 @@
 #include <raylib.h>
 #include "drawing.hh"
 #include "consts.hh"
+#include "math.hh"
 
 int main()
 {
@@ -8,7 +9,7 @@ int main()
 	SetTargetFPS(120);
 
 	while (!WindowShouldClose()) {
-		RaylibDrawing drawing;
-		drawing();
+		RaylibDrawing draw;
+		draw();
 	}
 }
