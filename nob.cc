@@ -9,7 +9,7 @@ int main(int argc, char** argv)
 	std::string executable_str = executable_path.filename().string();
 	std::string exec_stage2 = "bin/" + executable_str + "_stage2";
 
-	auto files = Kitchen::Ingredients().add_ingredients("nob_stage2.cpp");
+	auto files = Kitchen::Ingredients().add_ingredients("src_build/nob_stage2.cc");
 	auto recipe = Kitchen::CompilerRecipe("nob_stage2")
 					  .compiler(CC)
 					  .std_version("c++23")

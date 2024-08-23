@@ -1,4 +1,4 @@
-#include "build.hh"
+#include "../build.hh"
 #include <cstdio>
 #include <filesystem>
 #include <functional>
@@ -34,21 +34,20 @@ int main(int argc, char** argv)
 		Sink::start_job_sync({"tar", "xzf", "./external/raylib-5.0_linux_amd64.tar.gz", "-C", "./external"});
 	}
 
-	auto non_main_file_names = ranges::subrange(fs::directory_iterator("."), fs::directory_iterator())
+	auto non_main_file_names = ranges::subrange(fs::directory_iterator("./src"), fs::directory_iterator())
 							 | views::filter([](auto&& value) {
 								   fs::path path = value;
-								   return path.has_extension() && path.extension() == ".cpp";
+								   return path.has_extension() && path.extension() == ".cc";
 							   })
 							 | views::filter([](auto&& value) {
 								   fs::path path = value;
-								   return (!(path.filename() == "nob.cpp" || path.filename() == "nob_stage2.cpp"
-											 || path.filename() == "main.cpp"));
+								   return (!(path.filename() == "nob.cc" || path.filename() == "nob_stage2.cc"
+											 || path.filename() == "main.cc"));
 							   })
 							 | views::transform([](auto&& value) {
-								   auto fullname = ((fs::path)value).string();
+								   auto fullname = ((fs::path)value).filename().string();
 								   size_t lastindex = fullname.find_last_of(".");
-								   std::string name = fullname.substr(0, lastindex);
-								   return name.substr(2, name.size());
+								   return fullname.substr(0, lastindex);
 							   })
 							 | std::views::common | ranges::to<std::vector<std::string>>();
 
@@ -67,14 +66,14 @@ int main(int argc, char** argv)
 			auto files = new Ingredients();
 			auto o_file = "build/" + filename + ".o";
 			created_files.add_ingredients(o_file);
-			files->add_ingredients(filename + ".cpp");
+			files->add_ingredients("src/" + filename + ".cc");
 
 			auto recipe = new CompilerRecipe("");
 			recipe->compiler(CC)
-				.push(flags.get_ingredients())
 				.cache()
-				.output(o_file)
 				.std_version("c++23")
+				.push(flags.get_ingredients())
+				.output(o_file)
 				.files(*files);
 
 			line_cook += recipe;
@@ -85,7 +84,7 @@ int main(int argc, char** argv)
 		if (status != 0) std::exit(status);
 	}
 
-	o_files += "main.cpp";
+	o_files += "src/main.cc";
 	main.compiler(CC)
 		.cache()
 		.std_version("c++23")
