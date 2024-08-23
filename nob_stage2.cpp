@@ -15,11 +15,11 @@ namespace ranges = std::ranges;
 void help()
 {
 	std::cout << std::endl;
-	std::cout << "[HELP]: provide one of the arguments:" << std::endl;
-	std::cout << "[HELP]:	-> run - compile and run the app" << std::endl;
-	std::cout << "[HELP]:	-> help - display help" << std::endl;
-	std::cout << "[HELP]:	-> build - compile the app" << std::endl;
-	std::cout << "[HELP]:	-> clean - remove build artefacts" << std::endl;
+	std::cout << "[HELP] provide one of the arguments:" << std::endl;
+	std::cout << "[HELP]	-> run - compile and run the app" << std::endl;
+	std::cout << "[HELP]	-> help - display help" << std::endl;
+	std::cout << "[HELP]	-> build - compile the app" << std::endl;
+	std::cout << "[HELP]	-> clean - remove build artefacts" << std::endl;
 }
 
 int main(int argc, char** argv)
