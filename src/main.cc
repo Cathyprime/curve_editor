@@ -1,19 +1,23 @@
-#include "drawing.hh"
-#include "math.hh"
 #include <raylib.h>
 #include <string>
 #include <vector>
+
+#include "drawing.hh"
+#include "math.hh"
 
 #define CIRCLE_RADIUS 10
 #define WIDTH 1920
 #define HEIGHT 1080
 
-Vector2* dragged_point = nullptr;
-std::vector<Vector2> points;
-Vector2 mouse;
-
 int main()
 {
+	Vector2 max{.x = 1920, .y = 1080};
+	Vector2 min{.x = 0, .y = 0};
+
+	Vector2* dragged_point = nullptr;
+	std::vector<Vector2> points;
+	Vector2 mouse;
+
 	InitWindow(WIDTH, HEIGHT, "Hello, Raylib!");
 	SetTargetFPS(120);
 
@@ -24,7 +28,7 @@ int main()
 	points.push_back(Vector2(1160, 740));
 
 	while (!WindowShouldClose()) {
-		mouse = GetMousePosition();
+		mouse = bezier::Clamp(GetMousePosition(), max, min);
 		if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
 			if (dragged_point == nullptr) {
 				for (auto& point : points) {

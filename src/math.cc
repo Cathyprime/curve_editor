@@ -1,4 +1,5 @@
 #include "math.hh"
+#include <algorithm>
 #include <raylib.h>
 
 Vector2 operator*(const Vector2& vec, float scalar)
@@ -41,6 +42,14 @@ Vector2 Laura_Cubic_Polynomial(Vector2 P0, Vector2 P1, Vector2 P2, Vector2 P3, f
 		 + t_2 * (3 * P0 - 6 * P1 + 3 * P2)
 		 + t * (-3 * P0 + 3 * P1)
 		 + P0;
+}
+
+Vector2 Clamp(Vector2 vec, Vector2 max, Vector2 min)
+{
+	return Vector2{
+		.x = std::min(std::max(vec.x, min.x), max.x),
+		.y = std::min(std::max(vec.y, min.y), max.y),
+	};
 }
 
 } // namespace bezier
