@@ -1,6 +1,7 @@
 #include "drawing.hh"
 #include "consts.hh"
 #include "math.hh"
+#include <cstdlib>
 #include <raylib.h>
 #include <string>
 
@@ -37,6 +38,22 @@ void RaylibDrawing::operator()()
 
 void RaylibDrawing::update()
 {
+	mouse = GetMousePosition();
+
+	if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+		if (dragged_point == nullptr) {
+			for (auto& point : points) {
+				if (CheckCollisionPointCircle(mouse, point, CIRCLE_RADIUS + 10)) {
+					dragged_point = &point;
+					break;
+				}
+			}
+		} else {
+			*dragged_point = mouse;
+		}
+	} else { // UP
+		dragged_point = nullptr;
+	}
 }
 
 void RaylibDrawing::draw()

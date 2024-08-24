@@ -81,11 +81,6 @@ int main(int argc, char** argv)
 			o_files.add_ingredients(o_file);
 		}
 
-		int status = line_cook.cook();
-		if (status != 0) {
-			Sink::log(Sink::LogLevel::ERROR, "failed to build .o files");
-			std::exit(status);
-		}
 	}
 
 	o_files += "src/main.cc";
@@ -103,12 +98,24 @@ int main(int argc, char** argv)
 
 	std::unordered_map<std::string, std::function<void()>> arg_handler{};
 	arg_handler.insert_or_assign("run", [&]() {
+		int status = line_cook.cook();
+		if (status != 0) {
+			Sink::log(Sink::LogLevel::ERROR, "failed to build .o files");
+			std::exit(status);
+		}
 		if (Kitchen::cook(&main) != 0)
 			std::exit(1);
 		std::cout << std::endl;
 		Sink::start_job_sync({"./bin/main"});
 	});
-	arg_handler.insert_or_assign("build", [&]() { std::exit(Kitchen::cook(&main)); });
+	arg_handler.insert_or_assign("build", [&]() {
+		int status = line_cook.cook();
+		if (status != 0) {
+			Sink::log(Sink::LogLevel::ERROR, "failed to build .o files");
+			std::exit(status);
+		}
+		std::exit(Kitchen::cook(&main));
+	});
 	arg_handler.insert_or_assign("clean", [&]() {
 		for (const auto& file : created_files.get_ingredients()) {
 			Sink::print_command({"rm", "-rf", file});
